@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CintaRupiah AI - Paham Rupiah, Cerdas Bertransaksi di Bali</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti -->
+    <script defer src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .bg-bi-navy { background-color: #002B5B; }
+        .bg-bi-gold { background-color: #C5A880; }
+        .text-bi-navy { color: #002B5B; }
+        .text-bi-gold { color: #C5A880; }
+        .border-bi-gold { border-color: #C5A880; }
+        .scan-line {
+            position: absolute; top: 0; left: 0; right: 0; height: 4px;
+            background: linear-gradient(90deg, transparent, #3b82f6, transparent);
+            box-shadow: 0 0 15px #3b82f6;
+            animation: scan 2.5s infinite ease-in-out;
+        }
+        @keyframes scan {
+            0% { top: 5%; opacity: 0.8; }
+            50% { top: 90%; opacity: 1; }
+            100% { top: 5%; opacity: 0.8; }
+        }
+        .certificate-border { border: 12px double #002B5B; outline: 3px solid #C5A880; }
+        @page { size: A4 landscape; margin: 0; }
+        @media print {
+            .cetak-sembunyi { display: none !important; }
+            html, body { background: #fff !important; height: auto !important; min-height: 0 !important; display: block !important; }
+            /* Pembungkus sertifikat dilepas dari batas lebar, padding, dan bingkai agar sertifikat memenuhi halaman */
+            .cetak-induk {
+                display: block !important; max-width: none !important; width: 100% !important;
+                margin: 0 !important; padding: 0 !important; border: 0 !important;
+                box-shadow: none !important; background: transparent !important;
+                border-radius: 0 !important; height: auto !important; min-height: 0 !important;
+            }
+            #sertifikat, #sertifikat * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            /* Margin kertas 0 menghilangkan tanggal/URL bawaan browser; jarak tepi diberikan di sini */
+            main.cetak-induk { padding: 12mm !important; }
+            #sertifikat {
+                box-shadow: none !important; break-inside: avoid; page-break-inside: avoid;
+                width: 100% !important; max-width: none !important; margin: 0 !important;
+                padding: 28px 56px !important; box-sizing: border-box;
+                display: flex !important; flex-direction: column; align-items: center; justify-content: center;
+                height: 186mm;
+            }
+            #sertifikat > div:last-child { width: 100%; }
+            @media (orientation: portrait) {
+                #sertifikat { height: 150mm; padding: 24px 36px !important; }
+                #sertifikat h5 { font-size: 44px !important; }
+                #certName { font-size: 32px !important; }
+            }
+            /* Ukuran huruf diperbesar khusus saat cetak */
+            #sertifikat > * + * { margin-top: 18px !important; }
+            #sertifikat .text-xs { font-size: 17px !important; line-height: 1.5 !important; }
+            #sertifikat h5 { font-size: 52px !important; line-height: 1.15 !important; }
+            #certName { font-size: 38px !important; line-height: 1.3 !important; padding-left: 48px !important; padding-right: 48px !important; }
+            #sertifikat .max-w-md { max-width: 760px !important; }
+            #sertifikat .text-\[10px\] { font-size: 13px !important; line-height: 1.5 !important; }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col justify-between">
+
+    <!-- HEADER -->
+    <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-xl bg-bi-navy text-white flex items-center justify-center font-bold text-2xl shadow-lg">
+                    <span class="text-amber-400">Rp</span>
+                </div>
+                <div>
+                    <h1 class="text-xl font-extrabold text-bi-navy leading-tight">CintaRupiah <span class="text-amber-600">AI</span></h1>
+                    <p class="text-xs text-slate-500 font-semibold">Karya Tim SD No. 2 Tuban</p>
+                </div>
+            </div>
+            <nav class="hidden md:flex items-center gap-6 font-semibold text-sm text-slate-600">
+                <a href="#scanner" class="hover:text-bi-navy transition-colors">Vision AI Authenticator</a>
+                <a href="#chatbot" class="hover:text-bi-navy transition-colors">Bli Rupiah AI</a>
+                <a href="#kalkulator" class="hover:text-bi-navy transition-colors">QRIS & Cashflow</a>
+                <a href="#latihan" class="hover:text-bi-navy transition-colors">Latihan Kasus</a>
+                <a href="#kuis" class="hover:text-bi-navy transition-colors">Sertifikat Challenge</a>
+            </nav>
+            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span> Live Gemini AI
+            </span>
+        </div>
+    </header>
+
+    <!-- HERO -->
+    <section class="bg-gradient-to-br from-slate-900 via-bi-navy to-slate-900 text-white py-16 px-4 text-center space-y-4">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-semibold uppercase">
+            <i class="fa-solid fa-trophy"></i> Supporting Bali Smart Society & UMKM Digital
+        </div>
+        <h2 class="text-3xl sm:text-5xl font-black tracking-tight">Bangga, Paham, & Cinta Rupiah</h2>
+        <p class="text-slate-300 max-w-2xl mx-auto text-sm sm:text-base">Platform edukasi AI terpadu untuk autentikasi fisik uang Rupiah (3D) dengan kamera HP, QRIS UMKM Bali, dan kuis berhadiah sertifikat digital.</p>
+    </section>
+
+    <!-- MAIN CONTAINER -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16">
+
+        <!-- FITUR 1: AI VISION SCANNER (Kamera HP & Upload Foto + Sampel Instan) -->
+        <section id="scanner" class="scroll-mt-24">
+            <div class="text-center max-w-3xl mx-auto mb-10">
+                <span class="text-xs font-bold text-amber-600 uppercase tracking-widest">AI Core #1 • Computer Vision</span>
+                <h3 class="text-2xl sm:text-3xl font-extrabold text-bi-navy">AI Vision Authenticator (Live Camera & Upload)</h3>
+                <p class="text-slate-600 mt-2">Gunakan kamera HP atau unggah foto untuk mendapat analisis awal dari AI. Hasilnya hanya dari foto, jadi tetap periksa langsung dengan metode 3D (Dilihat, Diraba, Diterawang).</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8 items-center bg-white p-6 sm:p-8 rounded-3xl shadow-xl border border-slate-200">
+                <!-- Area Tampilan Kamera / Upload / Simulasi -->
+                <div class="relative bg-slate-950 rounded-2xl overflow-hidden aspect-video sm:aspect-square flex flex-col items-center justify-center border-4 border-slate-800 shadow-inner">
+                    <video id="cameraStream" autoplay playsinline class="hidden w-full h-full object-cover"></video>
+                    <img id="capturedImageView" class="hidden w-full h-full object-cover" alt="Uploaded Preview">
+                    
+                    <div id="scanOverlay" class="hidden absolute inset-0 bg-blue-900/10 backdrop-blur-[1px] z-10 flex flex-col justify-between p-4">
+                        <div class="scan-line"></div>
+                        <div class="text-center text-xs text-amber-300 font-mono bg-black/70 py-1 px-3 rounded">
+                            AI Vision menganalisis fitur 3D uang Rupiah...
+                        </div>
+                    </div>
+
+                    <div id="cameraPlaceholder" class="text-center p-6 space-y-3">
+                        <div class="w-16 h-16 mx-auto rounded-full bg-slate-900 border border-slate-700 flex items-center justify-center text-slate-400 text-2xl">
+                            <i class="fa-solid fa-camera"></i>
+                        </div>
+                        <p class="text-slate-400 text-xs">Aktifkan Kamera HP, Unggah Foto, atau Pilih Sampel di Samping</p>
+                    </div>
+                </div>
+
+                <!-- Kontrol & Hasil Diagnostik -->
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-2 uppercase">Aksi Kamera & Unggah Foto:</label>
+                        <div class="grid grid-cols-2 gap-2 mb-4">
+                            <button onclick="bukaKameraHP()" class="p-3 bg-bi-navy text-white rounded-xl text-xs font-bold hover:bg-slate-800 flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-camera-rotate"></i> Buka Kamera HP
+                            </button>
+                            <label class="p-3 bg-amber-500 text-slate-950 rounded-xl text-xs font-bold hover:bg-amber-400 flex items-center justify-center gap-2 cursor-pointer shadow">
+                                <i class="fa-solid fa-upload"></i> Upload Foto
+                                <input type="file" accept="image/*" onchange="prosesUploadFoto(event)" class="hidden">
+                            </label>
+                        </div>
+
+                        <button type="button" id="btnAmbilFoto" onclick="ambilFotoDariKamera()" class="hidden w-full mb-4 p-3 bg-emerald-600 text-white rounded-xl text-xs font-bold hover:bg-emerald-500 flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-camera"></i> Ambil Foto & Analisis
+                        </button>
+
+                        <label class="block text-xs font-bold text-slate-700 mb-2 uppercase">Atau lihat contoh tampilan hasil (mode demo, tanpa analisis AI):</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="simulasikanScan('100k')" class="p-2.5 border rounded-xl hover:border-bi-navy text-left text-xs font-bold">💵 Rp 100.000 Baru</button>
+                            <button onclick="simulasikanScan('50k')" class="p-2.5 border rounded-xl hover:border-bi-navy text-left text-xs font-bold">💵 Rp 50.000 Baru</button>
+                            <button onclick="simulasikanScan('lusuh')" class="p-2.5 border rounded-xl hover:border-amber-400 text-left text-xs font-bold text-amber-700">💡 Uji Kondisi Lusuh</button>
+                            <button onclick="simulasikanScan('palsu')" class="p-2.5 border border-red-200 rounded-xl hover:border-red-500 text-left text-xs font-bold text-red-600">⚠️ Uji Indikasi Palsu</button>
+                        </div>
+                    </div>
+
+                    <!-- Hasil Diagnostik AI -->
+                    <div id="aiResultCard" class="hidden p-4 rounded-2xl border bg-slate-50 space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span id="statusBadge" class="px-2.5 py-1 rounded-full text-[10px] font-bold">STATUS</span>
+                            <span id="modeLabel" class="text-[11px] text-slate-500"></span>
+                        </div>
+                        <h4 id="resultTitle" class="font-bold text-slate-900 text-sm">Hasil AI Vision</h4>
+                        <ul id="resultDetails" class="text-xs text-slate-600 space-y-1 pl-4 list-disc"></ul>
+                        <div id="biRecommendation" class="p-2 text-[11px] bg-white rounded border"></div>
+                        <div id="suaraBox" class="hidden flex-wrap items-center gap-2 pt-1">
+                            <span class="text-[11px] text-slate-500">Dengarkan perkiraan pecahan:</span>
+                            <button type="button" onclick="bacakanNominal('id')" class="px-3 py-1.5 rounded-lg bg-bi-navy text-white text-[11px] font-bold"><i class="fa-solid fa-volume-high"></i> Indonesia</button>
+                            <button type="button" onclick="bacakanNominal('en')" class="px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 text-[11px] font-bold"><i class="fa-solid fa-volume-high"></i> English</button>
+                        </div>
+                        <p id="scanDisclaimer" class="text-[10px] text-slate-400"></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FITUR 2: CHATBOT BLI RUPIAH AI (TERINTEGRASI GEMINI API) -->
+        <section id="chatbot" class="scroll-mt-24">
+            <div class="text-center max-w-3xl mx-auto mb-10">
+                <span class="text-xs font-bold text-amber-600 uppercase tracking-widest">AI Core #2 • Google Gemini AI</span>
+                <h3 class="text-2xl sm:text-3xl font-extrabold text-bi-navy">Asisten Cerdas "Bli Rupiah AI"</h3>
+                <p class="text-slate-600 mt-2">Tanyakan seputar keaslian uang, fitur QRIS Bali, tempat penukaran kas keliling, hingga edukasi Rupiah.</p>
+            </div>
+
+            <div class="max-w-4xl mx-auto bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden flex flex-col h-[500px]">
+                <div class="bg-bi-navy text-white p-4 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-amber-400 text-bi-navy font-bold flex items-center justify-center">
+                        <i class="fa-solid fa-robot"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-sm">Bli Rupiah AI (Powered by Gemini API)</h4>
+                        <p class="text-[11px] text-amber-200">Aktif • Siap Menjawab Pertanyaan Keuangan Anda</p>
+                    </div>
+                </div>
+
+                <div id="chatMessages" class="flex-1 p-4 overflow-y-auto space-y-4 bg-slate-50 text-sm">
+                    <div class="flex gap-3">
+                        <div class="w-8 h-8 rounded-full bg-bi-navy text-white flex items-center justify-center shrink-0 text-xs font-bold">BI</div>
+                        <div class="bg-white p-3.5 rounded-2xl rounded-tl-none shadow-sm border border-slate-200 max-w-[80%] space-y-1">
+                            <p class="font-semibold text-slate-900">Om Swastyastu! Suksma sampun menyapa Bli Rupiah AI 🙏</p>
+                            <p class="text-slate-600 text-xs">Saya siap membantu informasi seputar 3D (Dilihat, Diraba, Diterawang), QRIS Cross-Border di Bali, atau penukaran uang lusuh.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="px-4 py-2 bg-slate-100 border-t flex gap-2 overflow-x-auto text-xs">
+                    <button type="button" onclick="sendQuick('asli')" class="px-3 py-1 bg-white rounded-full border hover:border-bi-navy whitespace-nowrap">💡 Cara bedakan Uang Asli</button>
+                    <button type="button" onclick="sendQuick('lusuh')" class="px-3 py-1 bg-white rounded-full border hover:border-bi-navy whitespace-nowrap">🏦 Penukaran Uang Lusuh</button>
+                    <button type="button" onclick="sendQuick('qris')" class="px-3 py-1 bg-white rounded-full border hover:border-bi-navy whitespace-nowrap">🌴 QRIS UMKM Bali</button>
+                    <button type="button" onclick="sendQuick('jangan')" class="px-3 py-1 bg-white rounded-full border hover:border-bi-navy whitespace-nowrap">🖐️ 5 Jangan Merawat Rupiah</button>
+                    <button type="button" onclick="sendQuick('palsu')" class="px-3 py-1 bg-white rounded-full border hover:border-bi-navy whitespace-nowrap">⚠️ Terima Uang Palsu?</button>
+                    <button type="button" onclick="sendQuick('cbp')" class="px-3 py-1 bg-white rounded-full border hover:border-bi-navy whitespace-nowrap">🇮🇩 Cinta Bangga Paham Rupiah</button>
+                </div>
+
+                <form onsubmit="handleChatSubmit(event)" class="p-3 bg-white border-t flex gap-2">
+                    <input type="text" id="userInput" placeholder="Tulis pertanyaan Anda..." class="flex-1 px-4 py-2 rounded-xl border text-sm focus:outline-none focus:border-bi-navy">
+                    <button type="submit" id="btnKirim" class="px-5 py-2 bg-bi-navy text-white font-bold rounded-xl text-sm">Kirim</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- FITUR 3: KALKULATOR QRIS & CASHFLOW UMKM BALI -->
+        <section id="kalkulator" class="scroll-mt-24">
+            <div class="text-center max-w-3xl mx-auto mb-10">
+                <span class="text-xs font-bold text-amber-600 uppercase tracking-widest">Fitur #3 • Smart Commerce</span>
+                <h3 class="text-2xl sm:text-3xl font-extrabold text-bi-navy">Kalkulator Bijak Transaksi QRIS UMKM Bali</h3>
+                <p class="text-slate-600 mt-2">Hitung efisiensi pengelolaan uang tunai vs non-tunai QRIS untuk pedagang dan wisatawan di Bali.</p>
+            </div>
+
+            <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-xl border border-slate-200 max-w-4xl mx-auto grid md:grid-cols-2 gap-8">
+                <div class="space-y-4">
+                    <h4 class="font-bold text-slate-900 border-b pb-2">Simulasi Belanja Produk Lokal Bali</h4>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Item Produk Bali:</label>
+                        <select id="produkSelect" onchange="hitungQris()" class="w-full p-2.5 rounded-xl border text-sm font-semibold">
+                            <option value="45000">Kopi Kintamani Premium (Rp 45.000)</option>
+                            <option value="150000">Kain Endek Bali Handwoven (Rp 150.000)</option>
+                            <option value="35000">Pie Susu khas Bali 1 Box (Rp 35.000)</option>
+                            <option value="250000">Kerajinan Ukiran Kayu Ubud (Rp 250.000)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Jumlah Pembelian (Qty):</label>
+                        <input type="number" id="qtyInput" value="2" min="1" onchange="hitungQris()" class="w-full p-2.5 rounded-xl border text-sm font-semibold">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Metode Pembayaran Utama:</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button type="button" onclick="setPayment('qris')" id="btnQris" class="p-2.5 rounded-xl border-2 border-bi-navy bg-blue-50 font-bold text-xs text-bi-navy">QRIS Digital</button>
+                            <button type="button" onclick="setPayment('cash')" id="btnCash" class="p-2.5 rounded-xl border-2 border-slate-200 font-bold text-xs text-slate-600">Uang Tunai</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 p-6 rounded-2xl border flex flex-col justify-between space-y-4">
+                    <h4 class="font-bold text-slate-900 border-b pb-2">Ringkasan Efisiensi</h4>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-slate-600">Total Transaksi:</span>
+                            <span id="totalNominal" class="font-bold text-slate-900">Rp 90.000</span>
+                        </div>
+                        <div class="flex justify-between text-xs">
+                            <span class="text-slate-500">Kembalian Fisik:</span>
+                            <span id="kembalianInfo" class="font-medium text-slate-700">Rp 0 (Pas via QRIS)</span>
+                        </div>
+                        <div class="flex justify-between text-xs">
+                            <span class="text-slate-500">Risiko Uang Lusuh / Palsu:</span>
+                            <span id="risikoInfo" class="font-bold text-emerald-600">0% (Aman Digital)</span>
+                        </div>
+                    </div>
+                    <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-800">
+                        <span class="font-bold block mb-1">Dampak Cinta Rupiah:</span>
+                        <span id="dampakKeterangan">Pembayaran via QRIS membantu efisiensi UMKM Bali dan menjaga kebersihan fisik uang Rupiah!</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Buku Kas Harian UMKM (data tersimpan di browser pengguna, ringkasan dibuat AI) -->
+            <div id="bukuKas" class="bg-white rounded-3xl p-6 sm:p-8 shadow-xl border border-slate-200 max-w-4xl mx-auto mt-8 space-y-4">
+                <div>
+                    <h4 class="font-bold text-slate-900">Buku Kas Harian UMKM</h4>
+                    <p class="text-xs text-slate-500 mt-1">Catat penjualan tunai dan QRIS tiap hari. Data hanya disimpan di browser ini. AI membuat ringkasan dari angka yang kamu catat.</p>
+                </div>
+                <form onsubmit="simpanKas(event)" class="grid grid-cols-2 md:grid-cols-4 gap-2 items-end">
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-600 mb-1">Tanggal</label>
+                        <input type="date" id="kasTanggal" required class="w-full p-2.5 rounded-xl border text-xs font-semibold">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-600 mb-1">Tunai (Rp)</label>
+                        <input type="number" id="kasTunai" min="0" max="1000000000" step="1" value="0" class="w-full p-2.5 rounded-xl border text-xs font-semibold">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-600 mb-1">QRIS (Rp)</label>
+                        <input type="number" id="kasQris" min="0" max="1000000000" step="1" value="0" class="w-full p-2.5 rounded-xl border text-xs font-semibold">
+                    </div>
+                    <button type="submit" class="p-2.5 bg-bi-navy text-white rounded-xl text-xs font-bold">Simpan Hari Ini</button>
+                </form>
+
+                <div class="grid grid-cols-3 gap-2 text-center text-xs">
+                    <div class="p-3 rounded-xl bg-slate-50 border"><div class="text-slate-500">Total Tunai</div><div id="kasTotalTunai" class="font-bold text-slate-900">Rp 0</div></div>
+                    <div class="p-3 rounded-xl bg-slate-50 border"><div class="text-slate-500">Total QRIS</div><div id="kasTotalQris" class="font-bold text-slate-900">Rp 0</div></div>
+                    <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-200"><div class="text-emerald-700">Porsi QRIS</div><div id="kasPersen" class="font-bold text-emerald-800">0%</div></div>
+                </div>
+
+                <div id="kasDaftar" class="text-xs divide-y border rounded-xl max-h-56 overflow-y-auto"></div>
+
+                <div class="flex flex-wrap items-center gap-3">
+                    <button type="button" id="btnRingkas" onclick="mintaRingkasan()" class="px-5 py-2.5 bg-amber-500 text-slate-950 rounded-xl text-xs font-bold">Minta Ringkasan AI</button>
+                    <span class="text-[11px] text-slate-400">Perlu minimal 2 hari tercatat.</span>
+                </div>
+                <div id="kasRingkasan" class="hidden p-4 rounded-xl border bg-slate-50 text-xs text-slate-700 whitespace-pre-line"></div>
+            </div>
+        </section>
+
+        <!-- FITUR: LATIHAN KASUS DARI AI -->
+        <section id="latihan" class="scroll-mt-24">
+            <div class="text-center max-w-3xl mx-auto mb-10">
+                <span class="text-xs font-bold text-amber-600 uppercase tracking-widest">AI Core #3 • Latihan Kasus</span>
+                <h3 class="text-2xl sm:text-3xl font-extrabold text-bi-navy">Latihan Kasus Sehari-hari</h3>
+                <p class="text-slate-600 mt-2">AI membuat skenario baru setiap kali, kamu memilih tindakan yang tepat. Cocok untuk melatih kebiasaan merawat dan memeriksa Rupiah.</p>
+            </div>
+            <div class="max-w-3xl mx-auto bg-white rounded-3xl p-6 sm:p-8 shadow-xl border border-slate-200 space-y-4">
+                <div class="flex justify-between items-center text-xs font-semibold text-slate-500 border-b pb-3">
+                    <span>Latihan selesai: <b id="latSelesai">0</b></span>
+                    <span class="text-bi-navy">Tepat: <b id="latTepat">0</b></span>
+                </div>
+                <p id="latSkenario" class="text-sm sm:text-base font-semibold text-slate-900">Tekan tombol di bawah untuk mendapatkan skenario pertama.</p>
+                <div id="latPilihan" class="space-y-2"></div>
+                <div id="latPenjelasan" class="hidden text-xs rounded-xl p-3"></div>
+                <button type="button" id="btnLatihan" onclick="buatLatihan()" class="px-6 py-2.5 bg-bi-navy text-white font-bold rounded-xl text-sm">Buat Skenario Baru</button>
+            </div>
+        </section>
+
+        <!-- FITUR 4: KUIS & SERTIFIKAT DIGITAL -->
+        <section id="kuis" class="scroll-mt-24">
+            <div class="text-center max-w-3xl mx-auto mb-10">
+                <span class="text-xs font-bold text-amber-600 uppercase tracking-widest">Fitur #4 • Gamifikasi & Gamified Learning</span>
+                <h3 class="text-2xl sm:text-3xl font-extrabold text-bi-navy">Kuis Cinta Rupiah & Sertifikat Digital Duta</h3>
+                <p class="text-slate-600 mt-2">Uji pengetahuan Cinta, Bangga, Paham (CBP) Rupiah dan dapatkan Sertifikat Digital Anda!</p>
+            </div>
+
+            <div class="max-w-3xl mx-auto bg-white rounded-3xl p-6 sm:p-10 shadow-xl border border-slate-200">
+                <div id="nameStep" class="space-y-4 text-center">
+                    <p class="text-sm text-slate-600">Masukkan nama Anda untuk dicantumkan di sertifikat, lalu mulai kuis (<b id="infoSoal">10</b> soal, minimal <b id="infoLulus">7</b> benar untuk lulus).</p>
+                    <input type="text" id="namaPeserta" maxlength="40" placeholder="Nama lengkap Anda" onkeydown="if(event.key==='Enter')mulaiKuis()" class="w-full max-w-sm mx-auto block px-4 py-2.5 rounded-xl border text-sm text-center focus:outline-none focus:border-bi-navy">
+                    <button type="button" onclick="mulaiKuis()" class="px-6 py-2.5 bg-bi-navy text-white font-bold rounded-xl text-sm">Mulai Kuis</button>
+                </div>
+
+                <div id="quizContainer" class="hidden space-y-6">
+                    <div class="flex justify-between items-center text-xs font-semibold text-slate-500 border-b pb-3">
+                        <span>Soal <b id="questionNum">1</b> dari <b id="totalSoal">10</b></span>
+                        <span class="text-bi-navy">Skor: <b id="skorSaatIni">0</b></span>
+                    </div>
+                    <h4 id="questionText" class="text-base sm:text-lg font-bold text-slate-900">loading question...</h4>
+                    <div id="answersGroup" class="space-y-3"></div>
+                    <div id="penjelasan" class="hidden text-xs rounded-xl p-3"></div>
+                    <button type="button" id="btnLanjut" onclick="soalBerikutnya()" class="hidden px-6 py-2.5 bg-bi-navy text-white font-bold rounded-xl text-sm">Soal Berikutnya</button>
+                </div>
+
+                <div id="hasilBelumLulus" class="hidden text-center space-y-4">
+                    <div class="inline-block p-3 rounded-full bg-amber-100 text-amber-600 text-2xl">
+                        <i class="fa-solid fa-rotate-right"></i>
+                    </div>
+                    <h4 class="text-xl font-black text-bi-navy">Belum lulus, ayo coba lagi!</h4>
+                    <p class="text-sm text-slate-600">Skor Anda <b id="hasilSkor">-</b>. Nilai minimal untuk sertifikat adalah <b id="hasilLulus">-</b> jawaban benar.</p>
+                    <p class="text-xs text-slate-500">Soal akan diacak lagi. Baca penjelasan di tiap jawaban supaya lebih siap.</p>
+                    <button type="button" onclick="ulangiKuis()" class="px-6 py-2.5 bg-bi-navy text-white font-bold rounded-xl text-sm">Coba Lagi</button>
+                </div>
+
+                <div id="certificateContainer" class="hidden space-y-6">
+                    <div class="text-center space-y-2">
+                        <div class="inline-block p-3 rounded-full bg-emerald-100 text-emerald-600 text-2xl">
+                            <i class="fa-solid fa-award"></i>
+                        </div>
+                        <h4 class="text-xl font-black text-bi-navy">Selamat! Anda Lulus Kuis Cinta Rupiah</h4>
+                        <p class="text-xs text-slate-600">Sertifikat Digital Duta Cinta Rupiah Bali berhasil diterbitkan.</p>
+                    </div>
+
+                    <div id="sertifikat" class="certificate-border bg-slate-50 p-6 sm:p-8 rounded-xl text-center space-y-4 shadow-md">
+                        <div class="text-xs font-bold text-bi-gold uppercase tracking-widest">SERTIFIKAT DIGITAL EDUSMART</div>
+                        <h5 class="text-2xl font-black text-bi-navy">DUTA CINTA RUPIAH BALI</h5>
+                        <p class="text-xs text-slate-500">Diberikan kepada:</p>
+                        <div id="certName" class="text-xl font-bold text-slate-900 border-b-2 border-bi-gold inline-block px-6 py-1 break-words max-w-full">NAMA PESERTA</div>
+                        <p class="text-xs text-slate-600 max-w-md mx-auto">Atas keberhasilannya memahami prinsip <b>Cinta, Bangga, Paham (CBP) Rupiah</b> serta mendukung QRIS Smart Society Bali.</p>
+                        <p class="text-[10px] text-slate-400">Sertifikat edukasi dari aplikasi ini, bukan dokumen resmi Bank Indonesia.</p>
+                        <div class="pt-4 flex justify-between items-end text-[10px] text-slate-500 border-t">
+                            <div><b>CintaRupiah AI</b><br>Karya Tim SD No. 2 Tuban<br>AI Web Innovation Challenge 2026</div>
+                            <div class="text-right"><b>NILAI</b> <span id="certNilai" class="font-mono text-emerald-600">-</span><br><b>ID PESERTA</b><br><span id="certId" class="font-mono text-emerald-600">-</span></div>
+                        </div>
+                    </div>
+                    <div class="flex justify-center gap-4">
+                        <button onclick="cetakSertifikat()" class="px-5 py-2.5 rounded-xl bg-bi-navy text-white text-xs font-bold flex items-center gap-2"><i class="fa-solid fa-print"></i> Cetak / Simpan PDF</button>
+                        <button onclick="ulangiKuis()" class="px-5 py-2.5 rounded-xl border text-xs font-bold">Ulangi Kuis</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-bi-navy text-white py-8 border-t text-center text-xs space-y-2">
+        <p>Aplikasi karya partisipasi <b>AI Web Innovation Challenge 2026</b> • Tema: <i>Build with AI, Solver for Bali</i></p>
+        <p class="text-slate-400">Dibuat oleh Tim SD No. 2 Tuban untuk AI Web Innovation Challenge 2026. Aplikasi ini karya peserta dan bukan produk resmi Bank Indonesia.</p>
+    </footer>
+
+    <!-- JAVASCRIPT LENGKAP (KAMERA, KALKULATOR, KUIS, & GEMINI API) -->
+    <script>
+
+       // ==========================================
+// FUNGSI PERBAIKAN: HYBRID (GEMINI API + FALLBACK)
+// ==========================================
+function esc(t){const d=document.createElement("div");d.textContent=t;return d.innerHTML;}
+
+// Memanggil /api/gemini dan membaca jawaban secara streaming.
+// onChunk(teksSejauhIni) dipanggil setiap ada potongan baru.
+async function panggilGeminiAI(pesanUser, onChunk, riwayat) {
+    const cadangan = "Suksma! Bli Rupiah AI selalu mengimbau untuk menjaga Rupiah dengan 3D (Dilihat, Diraba, Diterawang) dan memanfaatkan QRIS!";
+    try {
+        const response = await fetch('/api/gemini', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ pesan: pesanUser, riwayat: riwayat || [] })
+        });
+
+        // Error dikirim server sebagai JSON
+        if (!response.ok || (response.headers.get('content-type') || '').includes('application/json')) {
+            const data = await response.json().catch(() => ({}));
+            if (data.kuota) return data.error;  // tampilkan pesan kuota apa adanya
+            throw new Error(data.error || "Gagal mendapatkan respons");
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let teks = '';
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            teks += decoder.decode(value, { stream: true });
+            if (onChunk) onChunk(teks);
+        }
+        teks += decoder.decode();
+        return teks.trim() || cadangan;
+    } catch (error) {
+        console.error("Error panggil API Cloudflare:", error);
+        return cadangan;
+    }
+}
+        // 1. KAMERA & SCANNER AI (analisis foto lewat Gemini Vision, endpoint /api/scan)
+        let mediaStream = null;
+        const el = (id) => document.getElementById(id);
+
+        function tampilkanPreview(dataUrl) {
+            el('cameraStream').classList.add('hidden');
+            el('cameraPlaceholder').classList.add('hidden');
+            el('capturedImageView').src = dataUrl;
+            el('capturedImageView').classList.remove('hidden');
+        }
+
+        function hentikanKamera() {
+            if (mediaStream) {
+                mediaStream.getTracks().forEach(t => t.stop());
+                mediaStream = null;
+            }
+            el('btnAmbilFoto').classList.add('hidden');
+        }
+
+        // Perkecil gambar (maks 1024px) supaya cepat dikirim dan dianalisis
+        function perkecilKeDataUrl(sumber, lebar, tinggi) {
+            const MAKS = 1024;
+            const skala = Math.min(1, MAKS / Math.max(lebar, tinggi));
+            const canvas = document.createElement('canvas');
+            canvas.width = Math.round(lebar * skala);
+            canvas.height = Math.round(tinggi * skala);
+            canvas.getContext('2d').drawImage(sumber, 0, 0, canvas.width, canvas.height);
+            return canvas.toDataURL('image/jpeg', 0.85);
+        }
+
+        async function bukaKameraHP() {
+            el('aiResultCard').classList.add('hidden');
+            hentikanKamera();
+            try {
+                mediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                el('cameraStream').srcObject = mediaStream;
+                el('cameraPlaceholder').classList.add('hidden');
+                el('capturedImageView').classList.add('hidden');
+                el('cameraStream').classList.remove('hidden');
+                el('btnAmbilFoto').classList.remove('hidden');
+            } catch (err) {
+                alert("Tidak dapat mengakses kamera. Pastikan memberikan izin akses kamera di browser Anda.");
+            }
+        }
+
+        function ambilFotoDariKamera() {
+            const video = el('cameraStream');
+            if (!video.videoWidth) { alert("Kamera belum siap, tunggu sebentar lalu coba lagi."); return; }
+            const dataUrl = perkecilKeDataUrl(video, video.videoWidth, video.videoHeight);
+            hentikanKamera();
+            tampilkanPreview(dataUrl);
+            analisisFoto(dataUrl);
+        }
+
+        function prosesUploadFoto(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            hentikanKamera();
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    const dataUrl = perkecilKeDataUrl(img, img.naturalWidth, img.naturalHeight);
+                    tampilkanPreview(dataUrl);
+                    analisisFoto(dataUrl);
+                };
+                img.onerror = () => alert("File tidak dapat dibaca sebagai gambar.");
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+            event.target.value = '';
+        }
+
+        const WARNA_BADGE = {
+            aman: 'bg-emerald-100 text-emerald-800',
+            waspada: 'bg-amber-100 text-amber-800',
+            bahaya: 'bg-red-100 text-red-700',
+            netral: 'bg-slate-200 text-slate-700'
+        };
+
+        // Semua teks dimasukkan lewat textContent (aman dari HTML/script)
+        function renderHasil({ kelas, badge, judul, rincian, saran, mode, demo }) {
+            el('suaraBox').classList.add('hidden');
+            el('suaraBox').classList.remove('flex');
+            el('statusBadge').className = 'px-2.5 py-1 rounded-full text-[10px] font-bold ' + (WARNA_BADGE[kelas] || WARNA_BADGE.netral);
+            el('statusBadge').textContent = badge;
+            el('modeLabel').textContent = mode;
+            el('resultTitle').textContent = judul;
+            const ul = el('resultDetails');
+            ul.innerHTML = '';
+            rincian.forEach(t => {
+                const li = document.createElement('li');
+                li.textContent = t;
+                ul.appendChild(li);
+            });
+            el('biRecommendation').textContent = saran;
+            el('scanDisclaimer').textContent = demo
+                ? 'Ini hanya contoh tampilan hasil, bukan hasil analisis foto.'
+                : 'Hasil AI hanya indikasi awal dari foto. Pastikan dengan metode 3D (Dilihat, Diraba, Diterawang) atau tanyakan ke bank.';
+            el('aiResultCard').classList.remove('hidden');
+        }
+
+        const PETA_HASIL = {
+            terindikasi_asli: { kelas: 'aman', badge: 'TERINDIKASI ASLI', judul: 'Tidak ada tanda mencurigakan pada foto' },
+            perlu_verifikasi: { kelas: 'bahaya', badge: 'PERLU DIVERIFIKASI', judul: 'Ada tanda yang perlu dicek langsung' },
+            bukan_uang_rupiah: { kelas: 'netral', badge: 'BUKAN UANG RUPIAH', judul: 'Gambar tidak menampilkan uang kertas Rupiah' },
+            foto_kurang_jelas: { kelas: 'netral', badge: 'FOTO KURANG JELAS', judul: 'Foto belum cukup jelas untuk dianalisis' }
+        };
+
+        function renderHasilAI(d) {
+            const p = PETA_HASIL[d.hasil] || PETA_HASIL.foto_kurang_jelas;
+            const lusuh = d.kondisi === 'lusuh' || d.kondisi === 'rusak';
+            const rincian = [];
+            if (d.nominal && d.nominal !== 'tidak diketahui') rincian.push('Perkiraan pecahan: ' + d.nominal);
+            if (d.kondisi && d.kondisi !== 'tidak_diketahui') rincian.push('Kondisi fisik: ' + d.kondisi);
+            (d.temuan || []).forEach(t => rincian.push(t));
+            renderHasil({
+                kelas: (p.kelas === 'aman' && lusuh) ? 'waspada' : p.kelas,
+                badge: p.badge + (lusuh ? ' • KONDISI ' + d.kondisi.toUpperCase() : ''),
+                judul: p.judul,
+                rincian: rincian.length ? rincian : ['Tidak ada rincian tambahan.'],
+                saran: d.saran || 'Periksa langsung dengan metode 3D.',
+                mode: 'ANALISIS AI',
+                demo: false
+            });
+            // Tombol suara hanya muncul bila AI membaca pecahan dengan jelas
+            hasilSuara = d;
+            if (d.nominal && d.nominal !== 'tidak diketahui') {
+                el('suaraBox').classList.remove('hidden');
+                el('suaraBox').classList.add('flex');
+            }
+        }
+
+        // ---- Pembaca nominal dengan suara (memakai suara bawaan browser, tanpa kuota AI) ----
+        let hasilSuara = null;
+        const KATA_NOMINAL = {
+            1000: { id: 'seribu rupiah', en: 'one thousand rupiah' },
+            2000: { id: 'dua ribu rupiah', en: 'two thousand rupiah' },
+            5000: { id: 'lima ribu rupiah', en: 'five thousand rupiah' },
+            10000: { id: 'sepuluh ribu rupiah', en: 'ten thousand rupiah' },
+            20000: { id: 'dua puluh ribu rupiah', en: 'twenty thousand rupiah' },
+            50000: { id: 'lima puluh ribu rupiah', en: 'fifty thousand rupiah' },
+            100000: { id: 'seratus ribu rupiah', en: 'one hundred thousand rupiah' }
+        };
+        const KATA_KONDISI = {
+            baik: { id: 'baik', en: 'good' },
+            lusuh: { id: 'lusuh', en: 'worn' },
+            rusak: { id: 'rusak', en: 'damaged' }
+        };
+
+        function susunTeksSuara(d, bahasa) {
+            const angka = parseInt(String(d.nominal || '').replace(/\D/g, ''), 10);
+            const kata = KATA_NOMINAL[angka] ? KATA_NOMINAL[angka][bahasa] : String(d.nominal || '');
+            const kond = KATA_KONDISI[d.kondisi] ? KATA_KONDISI[d.kondisi][bahasa] : null;
+            if (bahasa === 'en') {
+                return 'Estimated banknote: ' + kata + '. ' + (kond ? 'Condition: ' + kond + '. ' : '') +
+                    'This is an estimate from the photo. Please also check the note by touch and by holding it up to the light.';
+            }
+            return 'Perkiraan pecahan: ' + kata + '. ' + (kond ? 'Kondisi: ' + kond + '. ' : '') +
+                'Ini perkiraan dari foto. Periksa juga dengan diraba dan diterawang.';
+        }
+
+        function bacakanNominal(bahasa) {
+            if (!hasilSuara) return;
+            if (!('speechSynthesis' in window)) { alert('Browser ini belum mendukung suara.'); return; }
+            window.speechSynthesis.cancel();
+            const u = new SpeechSynthesisUtterance(susunTeksSuara(hasilSuara, bahasa));
+            u.lang = bahasa === 'en' ? 'en-US' : 'id-ID';
+            u.rate = 0.95;
+            window.speechSynthesis.speak(u);
+        }
+
+        let sedangMenganalisis = false;
+
+        // Pemeriksaan sederhana di browser: foto yang sangat gelap atau sangat terang
+        // tidak dikirim ke AI, supaya tidak membuang satu permintaan.
+        function cekKecerahan(dataUrl) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => {
+                    const c = document.createElement('canvas');
+                    c.width = 48; c.height = 48;
+                    const g = c.getContext('2d');
+                    g.drawImage(img, 0, 0, 48, 48);
+                    const px = g.getImageData(0, 0, 48, 48).data;
+                    let total = 0;
+                    for (let i = 0; i < px.length; i += 4) total += 0.299 * px[i] + 0.587 * px[i + 1] + 0.114 * px[i + 2];
+                    const rata = total / (px.length / 4);
+                    resolve(rata < 30 ? 'terlalu gelap' : rata > 240 ? 'terlalu terang' : null);
+                };
+                img.onerror = () => resolve(null);
+                img.src = dataUrl;
+            });
+        }
+
+        async function analisisFoto(dataUrl) {
+            if (sedangMenganalisis) return;   // cegah foto terkirim dua kali
+            sedangMenganalisis = true;
+            el('scanOverlay').classList.remove('hidden');
+            el('aiResultCard').classList.add('hidden');
+            try {
+                const masalah = await cekKecerahan(dataUrl);
+                if (masalah) {
+                    renderHasil({
+                        kelas: 'netral',
+                        badge: 'FOTO KURANG JELAS',
+                        judul: 'Foto ' + masalah,
+                        rincian: ['Foto ' + masalah + ', jadi belum dikirim ke AI.'],
+                        saran: 'Coba foto lagi di tempat dengan cahaya yang cukup dan tanpa silau.',
+                        mode: 'PEMERIKSAAN FOTO',
+                        demo: false
+                    });
+                    return;
+                }
+                const res = await fetch('/api/scan', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ image: dataUrl })
+                });
+                const out = await res.json();
+                if (out.kuota) {
+                    renderHasil({
+                        kelas: 'netral',
+                        badge: 'LAYANAN PENUH',
+                        judul: 'Analisis foto sedang tidak tersedia',
+                        rincian: [out.error || 'Kuota analisis sedang penuh.'],
+                        saran: 'Periksa uang langsung dengan metode 3D (Dilihat, Diraba, Diterawang), atau coba lagi nanti.',
+                        mode: 'ANALISIS AI',
+                        demo: false
+                    });
+                    return;
+                }
+                if (!res.ok || !out.data) throw new Error(out.error || 'Analisis gagal');
+                renderHasilAI(out.data);
+            } catch (err) {
+                console.error('Gagal analisis foto:', err);
+                renderHasil({
+                    kelas: 'netral',
+                    badge: 'ANALISIS GAGAL',
+                    judul: 'Foto belum bisa dianalisis',
+                    rincian: ['Coba lagi dengan foto yang lebih terang dan jelas.'],
+                    saran: 'Jika masalah berlanjut, periksa uang langsung dengan metode 3D.',
+                    mode: 'ANALISIS AI',
+                    demo: false
+                });
+            } finally {
+                el('scanOverlay').classList.add('hidden');
+                sedangMenganalisis = false;
+            }
+        }
+
+        // Contoh tampilan hasil (mode demo, tidak memakai AI)
+        const DEMO = {
+            '100k': { kelas: 'aman', badge: 'CONTOH: TERINDIKASI ASLI', judul: 'Contoh hasil: pecahan Rp 100.000', rincian: ['Contoh tampilan jika Dilihat, Diraba, dan Diterawang sesuai standar BI.'], saran: '✓ Aman digunakan untuk transaksi harian.' },
+            '50k': { kelas: 'aman', badge: 'CONTOH: TERINDIKASI ASLI', judul: 'Contoh hasil: pecahan Rp 50.000', rincian: ['Contoh tampilan uang yang layak edar.'], saran: '✓ Aman digunakan untuk transaksi harian.' },
+            'lusuh': { kelas: 'waspada', badge: 'CONTOH: UANG LUSUH', judul: 'Contoh hasil: uang lusuh', rincian: ['Contoh uang asli yang kondisi fisiknya sudah menurun.'], saran: '💡 Tukarkan gratis di Kas Keliling Bank Indonesia.' },
+            'palsu': { kelas: 'bahaya', badge: 'CONTOH: PERLU DIVERIFIKASI', judul: 'Contoh hasil: ada tanda mencurigakan', rincian: ['Contoh: warna pudar dan cetakan tidak tajam.'], saran: '⚠️ Jangan diedarkan. Periksa dengan 3D dan tanyakan ke bank terdekat.' }
+        };
+
+        function simulasikanScan(tipe) {
+            hentikanKamera();
+            el('cameraStream').classList.add('hidden');
+            el('capturedImageView').classList.add('hidden');
+            el('cameraPlaceholder').classList.remove('hidden');
+            el('scanOverlay').classList.remove('hidden');
+            el('aiResultCard').classList.add('hidden');
+            setTimeout(() => {
+                el('scanOverlay').classList.add('hidden');
+                renderHasil({ ...DEMO[tipe], mode: 'MODE DEMO', demo: true });
+            }, 1000);
+        }
+
+        // 2. CHATBOT: jawaban tetap untuk topik umum (tanpa kuota AI) + Gemini untuk pertanyaan lain
+        const chatMessages = document.getElementById('chatMessages');
+        let sedangMenjawab = false;
+
+        const AVATAR = '<div class="w-8 h-8 rounded-full bg-bi-navy text-white flex items-center justify-center shrink-0 text-xs font-bold">BI</div>';
+        const KELAS_BOT = 'bg-white p-3 rounded-2xl border text-xs max-w-[80%] text-slate-700 whitespace-pre-line';
+
+        // Jawaban tetap. Ditulis tanpa markdown karena ditampilkan apa adanya.
+        const JAWABAN_CEPAT = {
+            asli: {
+                tanya: 'Bagaimana cara membedakan uang asli dan palsu?',
+                pola: /\b(asli|3d|keaslian)\b/,
+                jawab: "Om Swastyastu, Semeton! Cara paling mudah mengenali keaslian Rupiah adalah 3D:\n1. Dilihat: perhatikan warna, gambar utama, dan benang pengaman. Pada beberapa pecahan ada tinta yang berubah warna jika uang dimiringkan.\n2. Diraba: cetakan pada gambar utama dan angka terasa kasar, tidak licin seperti kertas biasa.\n3. Diterawang: arahkan ke cahaya, akan terlihat tanda air dan gambar saling isi yang pas.\nTetap periksa langsung uangnya, ya. Kalau ragu, tanyakan ke bank terdekat."
+            },
+            lusuh: {
+                tanya: 'Di mana bisa tukar uang lusuh di Denpasar?',
+                pola: /\b(lusuh|rusak|robek|penukaran)\b/,
+                jawab: "Om Swastyastu, Semeton! Uang lusuh atau rusak yang asli bisa ditukarkan, jangan dibuang.\n1. Tukarkan melalui kas keliling Bank Indonesia, kantor Bank Indonesia di Denpasar, atau bank yang melayani penukaran.\n2. Jangan dilipat, dicoret, atau dibasahi lagi supaya tidak makin rusak.\n3. Ada ketentuan kondisi fisik uang yang bisa diganti, jadi cek jadwal dan syarat terbaru di kanal resmi Bank Indonesia sebelum berangkat."
+            },
+            qris: {
+                tanya: 'Apa keuntungan pakai QRIS untuk UMKM di Bali?',
+                pola: /\bqris\b/,
+                jawab: "Om Swastyastu, Semeton! Keuntungan QRIS untuk UMKM di Bali:\n1. Satu kode QR bisa menerima pembayaran dari berbagai aplikasi bank dan dompet digital.\n2. Tidak perlu menyiapkan uang kembalian, dan risiko menerima uang palsu atau lusuh lebih kecil.\n3. Transaksi tercatat otomatis, memudahkan pembukuan.\n4. Wisatawan dari beberapa negara mitra dapat membayar dengan aplikasi dari negaranya.\nUntuk biaya dan cara daftar, tanyakan ke bank atau penyedia QRIS Anda karena ketentuannya bisa berubah."
+            },
+            jangan: {
+                tanya: 'Apa saja 5 Jangan untuk merawat Rupiah?',
+                pola: /\b(5 jangan|lima jangan|merawat|rawat)\b/,
+                jawab: "Om Swastyastu, Semeton! Ingat 5 Jangan untuk merawat Rupiah:\n1. Jangan dilipat\n2. Jangan dicoret\n3. Jangan distapler\n4. Jangan diremas\n5. Jangan dibasahi\nRupiah yang terawat awet dipakai dan tetap mudah dikenali keasliannya."
+            },
+            palsu: {
+                tanya: 'Apa yang harus dilakukan jika menerima uang palsu?',
+                pola: /\bpalsu\b/,
+                jawab: "Om Swastyastu, Semeton! Jika curiga menerima uang palsu:\n1. Jangan dibelanjakan atau diedarkan lagi, walaupun kita yang rugi.\n2. Jangan dicoret atau dirusak, simpan sebagai barang bukti.\n3. Ingat dari mana uang itu diterima.\n4. Bawa ke bank terdekat atau kantor Bank Indonesia, atau laporkan ke kepolisian untuk diperiksa.\nPeriksa dulu dengan 3D: Dilihat, Diraba, Diterawang."
+            },
+            cbp: {
+                tanya: 'Apa itu Cinta Bangga Paham Rupiah?',
+                pola: /\b(cinta bangga|bangga paham|cbp)\b/,
+                jawab: "Om Swastyastu, Semeton! Cinta Bangga Paham Rupiah adalah gerakan edukasi dari Bank Indonesia:\n1. Cinta: merawat Rupiah dengan baik.\n2. Bangga: memakai Rupiah sebagai alat pembayaran di Indonesia.\n3. Paham: tahu ciri keaslian Rupiah lewat 3D (Dilihat, Diraba, Diterawang).\nAyo mulai dari diri sendiri, Semeton!"
+            }
+        };
+        // Urutan pencocokan untuk teks yang diketik (palsu terakhir, supaya "asli dan palsu" masuk ke 'asli')
+        const URUTAN_POLA = ['jangan', 'cbp', 'qris', 'lusuh', 'asli', 'palsu'];
+
+        // Teks yang diketik hanya memakai jawaban tetap bila sangat singkat (maks. 3 kata),
+        // misalnya "qris" atau "5 jangan". Pertanyaan yang lebih spesifik selalu dikirim ke AI.
+        function cariJawabanCepat(text) {
+            const bersih = text.toLowerCase().replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
+            if (!bersih || bersih.split(' ').length > 3) return null;
+            return URUTAN_POLA.find(k => JAWABAN_CEPAT[k].pola.test(bersih)) || null;
+        }
+
+        function kunciChat(kunci) {
+            sedangMenjawab = kunci;
+            const btn = document.getElementById('btnKirim');
+            btn.disabled = kunci;
+            btn.classList.toggle('opacity-50', kunci);
+            btn.classList.toggle('cursor-not-allowed', kunci);
+        }
+
+        function tambahPesanUser(text) {
+            chatMessages.insertAdjacentHTML('beforeend', `<div class="flex justify-end"><div class="bg-bi-navy text-white p-3 rounded-2xl max-w-[80%] text-xs">${esc(text)}</div></div>`);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Membuat gelembung jawaban kosong dan mengembalikan elemen teksnya
+        function buatGelembungBot() {
+            chatMessages.insertAdjacentHTML('beforeend', `<div class="flex gap-3">${AVATAR}<div class="${KELAS_BOT}"></div></div>`);
+            return chatMessages.lastElementChild.lastElementChild;
+        }
+
+        // Jawaban tetap ditampilkan cepat bertahap supaya terasa hidup
+        async function tampilkanBertahap(teks) {
+            const bubble = buatGelembungBot();
+            for (let i = 0; i < teks.length; i += 8) {
+                bubble.textContent = teks.slice(0, i + 8);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                await new Promise(r => setTimeout(r, 10));
+            }
+            bubble.textContent = teks;
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        async function jawabDenganAI(text) {
+            const loadingId = 'loading-' + Date.now();
+            chatMessages.insertAdjacentHTML('beforeend', `<div id="${loadingId}" class="flex gap-3">${AVATAR}<div class="bg-white p-3 rounded-2xl border text-xs text-slate-400 italic">Bli Rupiah AI sedang berpikir...</div></div>`);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            const bersihkan = (t) => t.replace(/\*+/g, '');
+            let bubble = null;
+            const hapusLoading = () => { const l = document.getElementById(loadingId); if (l) l.remove(); };
+
+            const jawabanAI = await panggilGeminiAI(text, (sementara) => {
+                if (!bubble) { hapusLoading(); bubble = buatGelembungBot(); }
+                bubble.textContent = bersihkan(sementara);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }, riwayatChat.slice(-6));
+
+            if (!bubble) { hapusLoading(); bubble = buatGelembungBot(); }
+            bubble.textContent = bersihkan(jawabanAI);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            catatRiwayat(text, bersihkan(jawabanAI));
+        }
+
+        // Riwayat percakapan: dikirim ke server agar pertanyaan lanjutan ("kalau yang sobek?") dimengerti
+        const riwayatChat = [];
+        function catatRiwayat(tanya, jawab) {
+            riwayatChat.push({ role: 'user', text: tanya }, { role: 'assistant', text: jawab });
+            while (riwayatChat.length > 12) riwayatChat.shift();
+        }
+
+        async function jalankanChat(text, kunci) {
+            kunciChat(true);
+            try {
+                if (kunci) { await tampilkanBertahap(JAWABAN_CEPAT[kunci].jawab); catatRiwayat(text, JAWABAN_CEPAT[kunci].jawab); }
+                else await jawabDenganAI(text);
+            } finally {
+                kunciChat(false);
+            }
+        }
+
+        function sendQuick(kunci) {
+            if (sedangMenjawab || !JAWABAN_CEPAT[kunci]) return;
+            tambahPesanUser(JAWABAN_CEPAT[kunci].tanya);
+            jalankanChat(JAWABAN_CEPAT[kunci].tanya, kunci);
+        }
+
+        async function handleChatSubmit(e) {
+            e.preventDefault();
+            if (sedangMenjawab) return;
+            const input = document.getElementById('userInput');
+            const text = input.value.trim();
+            if (!text) return;
+            input.value = '';
+            tambahPesanUser(text);
+            await jalankanChat(text, cariJawabanCepat(text));
+        }
+
+        // 3. KALKULATOR QRIS
+        let currentMethod = 'qris';
+        function setPayment(m) {
+            currentMethod = m;
+            document.getElementById('btnQris').className = m === 'qris' ? "p-2.5 rounded-xl border-2 border-bi-navy bg-blue-50 font-bold text-xs text-bi-navy" : "p-2.5 rounded-xl border-2 border-slate-200 font-bold text-xs text-slate-600";
+            document.getElementById('btnCash').className = m === 'cash' ? "p-2.5 rounded-xl border-2 border-bi-navy bg-blue-50 font-bold text-xs text-bi-navy" : "p-2.5 rounded-xl border-2 border-slate-200 font-bold text-xs text-slate-600";
+            hitungQris();
+        }
+        function hitungQris() {
+            const harga = parseInt(document.getElementById('produkSelect').value);
+            const qty = parseInt(document.getElementById('qtyInput').value) || 1;
+            const total = harga * qty;
+            document.getElementById('totalNominal').innerText = 'Rp ' + total.toLocaleString('id-ID');
+            document.getElementById('kembalianInfo').innerText = currentMethod === 'qris' ? "Rp 0 (Pas via QRIS)" : "Memerlukan Kembalian Fisik";
+            document.getElementById('risikoInfo').innerText = currentMethod === 'qris' ? "0% (Aman Digital)" : "Potensi Uang Lusuh / Palsu";
+        }
+
+        // 4. KUIS & SERTIFIKAT
+        // ===================== DAFTAR SOAL =====================
+        // Cara menambah soal: salin satu baris { ... } lalu ubah isinya.
+        //   q       : pertanyaan
+        //   options : pilihan jawaban. Tulis JAWABAN BENAR sebagai pilihan PERTAMA.
+        //             (urutan pilihan diacak otomatis saat kuis berjalan)
+        //   exp     : penjelasan singkat yang muncul setelah menjawab
+        // Format lama { q, options, correct: nomor } juga masih bisa dipakai.
+        const BANK_SOAL = [
+            { q: "Apa rumus utama mengenali keaslian fisik uang kertas Rupiah?", options: ["3D (Dilihat, Diraba, Diterawang)", "3M", "3T"], exp: "3D adalah singkatan dari Dilihat, Diraba, dan Diterawang." },
+            { q: "Kamu ingin memeriksa tanda air dan gambar saling isi pada uang. Apa yang dilakukan?", options: ["Diterawang ke arah cahaya", "Diraba dengan jari", "Dicium baunya"], exp: "Tanda air dan gambar saling isi terlihat jelas saat uang diterawang ke arah cahaya." },
+            { q: "Pada metode 3D, bagian mana yang terasa kasar saat uang diraba?", options: ["Cetakan gambar utama dan angka", "Seluruh permukaan kertas", "Hanya bagian pinggir"], exp: "Cetakan pada bagian tertentu seperti gambar utama dan angka terasa kasar, tidak licin seperti kertas biasa." },
+            { q: "Pada beberapa pecahan, tinta pada gambar tertentu berubah warna saat uang dimiringkan. Bagian 3D yang mana?", options: ["Dilihat", "Diraba", "Diterawang"], exp: "Perubahan warna saat dimiringkan dikenali dengan melihat uang dari berbagai sudut." },
+            { q: "Salah satu '5 Jangan' merawat Rupiah adalah...", options: ["Jangan dilipat & dicoret", "Jangan disimpan", "Jangan dibelanjakan"], exp: "Lima Jangan: jangan dilipat, dicoret, distapler, diremas, dan dibasahi." },
+            { q: "Mana yang BUKAN termasuk '5 Jangan' merawat Rupiah?", options: ["Jangan dibelanjakan", "Jangan distapler", "Jangan dibasahi", "Jangan diremas"], exp: "Rupiah memang untuk dibelanjakan. Yang dijaga adalah kondisi fisiknya." },
+            { q: "Mengapa uang sebaiknya tidak dicoret?", options: ["Merusak kondisi fisik dan menyulitkan pengenalan keaslian", "Supaya uang lebih cepat habis", "Tidak ada pengaruhnya"], exp: "Coretan membuat uang cepat rusak dan tanda keasliannya lebih sulit dikenali." },
+            { q: "Apa yang sebaiknya dilakukan pada uang asli yang sudah lusuh?", options: ["Ditukarkan melalui layanan penukaran Bank Indonesia atau bank", "Dibuang", "Disimpan terus tanpa dipakai"], exp: "Uang lusuh yang asli masih bernilai dan bisa ditukarkan. Cek ketentuan terbaru di kanal resmi Bank Indonesia." },
+            { q: "Jika kamu curiga menerima uang palsu, sebaiknya...", options: ["Tidak dibelanjakan lagi dan dibawa ke bank atau Bank Indonesia", "Dibelanjakan di toko lain", "Dicoret supaya tidak dipakai"], exp: "Uang yang diduga palsu tidak boleh diedarkan lagi. Bawa ke bank atau Bank Indonesia untuk diperiksa." },
+            { q: "Jika ragu dengan keaslian sebuah uang, langkah terbaik adalah...", options: ["Periksa langsung dengan 3D dan tanyakan ke bank", "Langsung dibelanjakan saja", "Langsung dibuang"], exp: "Pemeriksaan langsung dengan 3D paling dapat diandalkan. Jika masih ragu, tanyakan ke bank." },
+            { q: "Mengapa hasil scanner foto di aplikasi ini hanya berupa indikasi awal?", options: ["AI hanya melihat foto, tidak bisa meraba atau menerawang uang", "Karena AI selalu salah", "Karena fotonya tidak boleh disimpan"], exp: "Hasil dari foto tidak menggantikan pemeriksaan langsung dengan metode 3D." },
+            { q: "QRIS adalah singkatan dari...", options: ["Quick Response Code Indonesian Standard", "Quick Rupiah Indonesian System", "Quality Response Indonesia Service"], exp: "QRIS adalah standar kode QR pembayaran di Indonesia." },
+            { q: "Kanal pembayaran non-tunai standar nasional dari Bank Indonesia adalah...", options: ["QRIS", "Debit Card", "Crypto"], exp: "QRIS adalah standar nasional kode QR untuk pembayaran dari Bank Indonesia." },
+            { q: "Apa keuntungan QRIS bagi pedagang kecil?", options: ["Satu kode QR bisa menerima pembayaran dari berbagai aplikasi", "Harus memasang banyak kode QR berbeda", "Hanya bisa dipakai oleh satu bank"], exp: "Dengan satu kode QRIS, pembeli bisa membayar memakai aplikasi bank atau dompet digital pilihannya." },
+            { q: "Salah satu keuntungan transaksi QRIS dibanding tunai adalah...", options: ["Tidak perlu menyiapkan uang kembalian", "Selalu lebih mahal", "Tidak tercatat sama sekali"], exp: "Pembayaran QRIS pas sesuai nominal dan tercatat otomatis, jadi tidak perlu uang kembalian." },
+            { q: "Kampanye Cinta Bangga Paham (CBP) Rupiah dilakukan oleh...", options: ["Bank Indonesia", "Kementerian Pariwisata", "Perusahaan telepon"], exp: "CBP Rupiah adalah gerakan edukasi dari Bank Indonesia." },
+            { q: "Arti 'Cinta' dalam Cinta Bangga Paham Rupiah adalah...", options: ["Merawat Rupiah dengan baik", "Menyimpan Rupiah sebanyak mungkin", "Menukar Rupiah ke mata uang asing"], exp: "Mencintai Rupiah berarti merawatnya, misalnya dengan tidak melipat, mencoret, atau membasahinya." },
+            { q: "Arti 'Bangga' dalam Cinta Bangga Paham Rupiah adalah...", options: ["Memakai Rupiah sebagai alat pembayaran di Indonesia", "Memamerkan uang kepada orang lain", "Hanya memakai uang baru"], exp: "Bangga berarti menggunakan Rupiah dalam transaksi di Indonesia." },
+            { q: "Arti 'Paham' dalam Cinta Bangga Paham Rupiah adalah...", options: ["Mengetahui ciri keaslian Rupiah", "Menghafal nomor seri uang", "Menghitung kurs setiap hari"], exp: "Paham berarti tahu cara mengenali keaslian Rupiah, yaitu dengan 3D." },
+            { q: "Alat pembayaran yang sah untuk transaksi di Indonesia adalah...", options: ["Rupiah", "Dolar", "Euro"], exp: "Rupiah adalah mata uang resmi dan alat pembayaran yang sah di Indonesia." }
+        ];
+
+        const JUMLAH_SOAL = 10;     // soal per sesi (diambil acak dari BANK_SOAL)
+        const PERSEN_LULUS = 0.7;   // 70% benar untuk mendapat sertifikat
+
+        const KELAS_PILIHAN = "w-full p-3 rounded-xl border hover:border-bi-navy text-left text-xs font-semibold text-slate-700";
+        const KELAS_BENAR = "w-full p-3 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-left text-xs font-semibold text-emerald-800";
+        const KELAS_SALAH = "w-full p-3 rounded-xl border-2 border-red-400 bg-red-50 text-left text-xs font-semibold text-red-700";
+        const KELAS_NONAKTIF = "w-full p-3 rounded-xl border text-left text-xs font-semibold text-slate-400";
+
+        let sesi = null;
+        let namaPeserta = '';
+
+        function acak(arr) {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        function siapkanSesi() {
+            const n = Math.min(JUMLAH_SOAL, BANK_SOAL.length);
+            sesi = {
+                soal: acak(BANK_SOAL).slice(0, n).map(s => ({
+                    q: s.q,
+                    exp: s.exp || '',
+                    benar: s.correct !== undefined ? s.options[s.correct] : s.options[0],
+                    pilihan: acak(s.options)
+                })),
+                idx: 0,
+                skor: 0,
+                terkunci: false,
+                lulus: Math.max(1, Math.ceil(n * PERSEN_LULUS))
+            };
+        }
+
+        function muatSoal() {
+            if (sesi.idx >= sesi.soal.length) { selesaiKuis(); return; }
+            const s = sesi.soal[sesi.idx];
+            sesi.terkunci = false;
+            el('questionNum').textContent = sesi.idx + 1;
+            el('totalSoal').textContent = sesi.soal.length;
+            el('skorSaatIni').textContent = sesi.skor;
+            el('questionText').textContent = s.q;
+            el('penjelasan').classList.add('hidden');
+            el('btnLanjut').classList.add('hidden');
+            const grp = el('answersGroup');
+            grp.innerHTML = '';
+            s.pilihan.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = KELAS_PILIHAN;
+                btn.textContent = opt;
+                btn.onclick = () => jawab(btn, opt);
+                grp.appendChild(btn);
+            });
+        }
+
+        function jawab(btn, opt) {
+            if (sesi.terkunci) return;
+            sesi.terkunci = true;
+            const s = sesi.soal[sesi.idx];
+            const benar = opt === s.benar;
+            if (benar) sesi.skor++;
+            Array.from(el('answersGroup').children).forEach(b => {
+                b.disabled = true;
+                if (b.textContent === s.benar) b.className = KELAS_BENAR;
+                else if (b === btn) b.className = KELAS_SALAH;
+                else b.className = KELAS_NONAKTIF;
+            });
+            el('skorSaatIni').textContent = sesi.skor;
+            const p = el('penjelasan');
+            p.textContent = (benar ? 'Benar! ' : 'Belum tepat. Jawaban yang benar: ' + s.benar + '. ') + s.exp;
+            p.className = 'text-xs rounded-xl p-3 ' + (benar ? 'bg-emerald-50 text-emerald-800' : 'bg-amber-50 text-amber-800');
+            el('btnLanjut').textContent = (sesi.idx === sesi.soal.length - 1) ? 'Lihat Hasil' : 'Soal Berikutnya';
+            el('btnLanjut').classList.remove('hidden');
+        }
+
+        function soalBerikutnya() {
+            sesi.idx++;
+            muatSoal();
+        }
+
+        function selesaiKuis() {
+            el('quizContainer').classList.add('hidden');
+            const n = sesi.soal.length;
+            if (sesi.skor >= sesi.lulus) {
+                el('certificateContainer').classList.remove('hidden');
+                el('certName').textContent = namaPeserta.toUpperCase();
+                el('certNilai').textContent = sesi.skor + '/' + n;
+                el('certId').textContent = 'CR-' + new Date().getFullYear() + '-' + Math.floor(100000 + Math.random() * 900000);
+                if (typeof confetti === 'function') confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            } else {
+                el('hasilSkor').textContent = sesi.skor + ' dari ' + n;
+                el('hasilLulus').textContent = sesi.lulus;
+                el('hasilBelumLulus').classList.remove('hidden');
+            }
+        }
+
+        function ulangiKuis() {
+            el('certificateContainer').classList.add('hidden');
+            el('hasilBelumLulus').classList.add('hidden');
+            siapkanSesi();
+            el('quizContainer').classList.remove('hidden');
+            muatSoal();
+            el('kuis').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function mulaiKuis() {
+            const input = el('namaPeserta');
+            const nama = input.value.trim();
+            if (!nama) { input.focus(); alert("Isi nama Anda dulu untuk dicantumkan di sertifikat."); return; }
+            namaPeserta = nama;
+            el('nameStep').classList.add('hidden');
+            siapkanSesi();
+            el('quizContainer').classList.remove('hidden');
+            muatSoal();
+        }
+
+        // Isi keterangan jumlah soal dan batas lulus di layar nama
+        (function () {
+            const n = Math.min(JUMLAH_SOAL, BANK_SOAL.length);
+            el('infoSoal').textContent = n;
+            el('infoLulus').textContent = Math.max(1, Math.ceil(n * PERSEN_LULUS));
+        })();
+
+        // Mencetak hanya sertifikat: semua elemen lain disembunyikan sementara saat dialog cetak terbuka
+        function cetakSertifikat() {
+            const target = document.getElementById('sertifikat');
+            const disembunyikan = [];
+            const pembungkus = [];
+            let node = target;
+            while (node && node !== document.body && node.parentElement) {
+                const induk = node.parentElement;
+                for (const saudara of induk.children) {
+                    if (saudara !== node) { saudara.classList.add('cetak-sembunyi'); disembunyikan.push(saudara); }
+                }
+                if (induk !== document.body) { induk.classList.add('cetak-induk'); pembungkus.push(induk); }
+                node = induk;
+            }
+            const pulihkan = () => {
+                disembunyikan.forEach(e => e.classList.remove('cetak-sembunyi'));
+                pembungkus.forEach(e => e.classList.remove('cetak-induk'));
+                window.removeEventListener('afterprint', pulihkan);
+            };
+            window.addEventListener('afterprint', pulihkan);
+            window.print();
+        }
+
+        // 5. BUKU KAS HARIAN UMKM
+        // Data disimpan di localStorage browser ini (bila tidak tersedia, hanya di memori halaman).
+        const KUNCI_KAS = 'cintarupiah_bukukas_v1';
+        let dataKas = [];
+        const rpFmt = (n) => 'Rp ' + Math.round(n).toLocaleString('id-ID');
+
+        function muatKas() {
+            try {
+                const t = localStorage.getItem(KUNCI_KAS);
+                const arr = t ? JSON.parse(t) : [];
+                dataKas = (Array.isArray(arr) ? arr : []).filter(x =>
+                    x && /^\d{4}-\d{2}-\d{2}$/.test(x.tgl) && Number.isFinite(x.tunai) && Number.isFinite(x.qris));
+            } catch (e) { dataKas = []; }
+        }
+        function simpanKeBrowser() {
+            try { localStorage.setItem(KUNCI_KAS, JSON.stringify(dataKas)); } catch (e) { /* abaikan */ }
+        }
+
+        function tanggalLokal() {
+            const d = new Date();
+            return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+        }
+
+        function renderKas() {
+            const urut = [...dataKas].sort((a, b) => b.tgl.localeCompare(a.tgl));
+            const tunai = dataKas.reduce((a, x) => a + x.tunai, 0);
+            const qris = dataKas.reduce((a, x) => a + x.qris, 0);
+            el('kasTotalTunai').textContent = rpFmt(tunai);
+            el('kasTotalQris').textContent = rpFmt(qris);
+            el('kasPersen').textContent = (tunai + qris ? Math.round(qris / (tunai + qris) * 100) : 0) + '%';
+
+            const daftar = el('kasDaftar');
+            daftar.innerHTML = '';
+            if (!urut.length) {
+                const kosong = document.createElement('div');
+                kosong.className = 'p-3 text-slate-400';
+                kosong.textContent = 'Belum ada catatan. Isi form di atas lalu tekan Simpan.';
+                daftar.appendChild(kosong);
+                return;
+            }
+            urut.forEach(x => {
+                const baris = document.createElement('div');
+                baris.className = 'flex items-center justify-between gap-2 p-2.5';
+                const info = document.createElement('div');
+                info.className = 'flex-1 min-w-0';
+                info.textContent = x.tgl + '  •  Tunai ' + rpFmt(x.tunai) + '  •  QRIS ' + rpFmt(x.qris);
+                const hapus = document.createElement('button');
+                hapus.type = 'button';
+                hapus.className = 'text-red-500 font-bold px-2';
+                hapus.textContent = 'Hapus';
+                hapus.onclick = () => { dataKas = dataKas.filter(y => y.tgl !== x.tgl); simpanKeBrowser(); renderKas(); };
+                baris.appendChild(info);
+                baris.appendChild(hapus);
+                daftar.appendChild(baris);
+            });
+        }
+
+        function simpanKas(e) {
+            e.preventDefault();
+            const tgl = el('kasTanggal').value;
+            const tunai = parseInt(el('kasTunai').value, 10) || 0;
+            const qris = parseInt(el('kasQris').value, 10) || 0;
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(tgl)) { alert('Pilih tanggal dulu.'); return; }
+            if (tunai < 0 || qris < 0 || tunai > 1e9 || qris > 1e9) { alert('Nominal tidak valid.'); return; }
+            dataKas = dataKas.filter(x => x.tgl !== tgl);          // satu catatan per tanggal
+            dataKas.push({ tgl, tunai, qris });
+            dataKas.sort((a, b) => a.tgl.localeCompare(b.tgl));
+            if (dataKas.length > 62) dataKas = dataKas.slice(-62);
+            simpanKeBrowser();
+            renderKas();
+            el('kasTunai').value = 0;
+            el('kasQris').value = 0;
+        }
+
+        async function mintaRingkasan() {
+            const kotak = el('kasRingkasan');
+            const tombol = el('btnRingkas');
+            if (dataKas.length < 2) {
+                kotak.textContent = 'Catat minimal 2 hari penjualan dulu ya.';
+                kotak.classList.remove('hidden');
+                return;
+            }
+            tombol.disabled = true;
+            tombol.classList.add('opacity-50');
+            kotak.textContent = 'Bli Rupiah AI sedang membuat ringkasan...';
+            kotak.classList.remove('hidden');
+            try {
+                const res = await fetch('/api/ringkas', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ data: dataKas.slice(-31) })
+                });
+                const out = await res.json().catch(() => ({}));
+                if (!res.ok || !out.ringkasan) {
+                    kotak.textContent = out.error || 'Ringkasan belum bisa dibuat. Coba lagi nanti.';
+                } else {
+                    kotak.textContent = out.ringkasan;
+                }
+            } catch (err) {
+                console.error('Gagal ringkasan:', err);
+                kotak.textContent = 'Ringkasan belum bisa dibuat. Periksa koneksi lalu coba lagi.';
+            } finally {
+                tombol.disabled = false;
+                tombol.classList.remove('opacity-50');
+            }
+        }
+
+        el('kasTanggal').value = tanggalLokal();
+        muatKas();
+        renderKas();
+
+        // 6. LATIHAN KASUS DARI AI
+        // Soal dibuat server (/api/latihan); penilaian jawaban dilakukan di browser (tidak memakai kuota lagi).
+        const JUMLAH_TOPIK_LATIHAN = 8;
+        let latihan = null;
+        let latSelesai = 0, latTepat = 0;
+
+        async function buatLatihan() {
+            const tombol = el('btnLatihan');
+            tombol.disabled = true;
+            tombol.classList.add('opacity-50');
+            el('latPenjelasan').classList.add('hidden');
+            el('latPilihan').innerHTML = '';
+            el('latSkenario').textContent = 'Bli Rupiah AI sedang menyiapkan skenario...';
+            try {
+                const res = await fetch('/api/latihan', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ topik: Math.floor(Math.random() * JUMLAH_TOPIK_LATIHAN) })
+                });
+                const out = await res.json().catch(() => ({}));
+                if (!res.ok || !out.data) {
+                    el('latSkenario').textContent = out.error || 'Skenario belum bisa dibuat. Coba lagi nanti.';
+                    return;
+                }
+                const d = out.data;
+                latihan = { benar: d.benar, penjelasan: d.penjelasan, terkunci: false };
+                el('latSkenario').textContent = d.skenario;
+                const urutan = acak(d.pilihan.map((teks, idx) => ({ teks, idx })));
+                urutan.forEach(p => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = KELAS_PILIHAN;
+                    btn.textContent = p.teks;
+                    btn.dataset.idx = p.idx;
+                    btn.onclick = () => jawabLatihan(btn);
+                    el('latPilihan').appendChild(btn);
+                });
+            } catch (err) {
+                console.error('Gagal latihan:', err);
+                el('latSkenario').textContent = 'Skenario belum bisa dibuat. Periksa koneksi lalu coba lagi.';
+            } finally {
+                tombol.disabled = false;
+                tombol.classList.remove('opacity-50');
+                tombol.textContent = 'Skenario Berikutnya';
+            }
+        }
+
+        function jawabLatihan(btn) {
+            if (!latihan || latihan.terkunci) return;
+            latihan.terkunci = true;
+            const benar = parseInt(btn.dataset.idx, 10) === latihan.benar;
+            latSelesai++;
+            if (benar) latTepat++;
+            Array.from(el('latPilihan').children).forEach(b => {
+                b.disabled = true;
+                if (parseInt(b.dataset.idx, 10) === latihan.benar) b.className = KELAS_BENAR;
+                else if (b === btn) b.className = KELAS_SALAH;
+                else b.className = KELAS_NONAKTIF;
+            });
+            el('latSelesai').textContent = latSelesai;
+            el('latTepat').textContent = latTepat;
+            const p = el('latPenjelasan');
+            p.textContent = (benar ? 'Tepat! ' : 'Belum tepat. ') + latihan.penjelasan +
+                ' (Soal dibuat AI sebagai latihan; untuk aturan resmi, cek kanal Bank Indonesia.)';
+            p.className = 'text-xs rounded-xl p-3 ' + (benar ? 'bg-emerald-50 text-emerald-800' : 'bg-amber-50 text-amber-800');
+        }
+
+    </script>
+</body>
+</html>
